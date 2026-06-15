@@ -1,44 +1,45 @@
+import { hasPostgresEnv, maskDatabaseUrl, resolveDatabaseEnv } from './database-env.mjs';
+
 const isProduction = process.env.NODE_ENV === 'production';
 if (!isProduction) process.exit(0);
 
-const client = (process.env.DATABASE_CLIENT ?? '').trim();
-const usesPostgres =
-  client === 'postgres' ||
-  Boolean(
-    process.env.DATABASE_URL?.trim() ||
-      process.env.DATABASE_PRIVATE_URL?.trim() ||
-      process.env.DATABASE_HOST?.trim() ||
-      process.env.PGHOST?.trim(),
-  );
+resolveDatabaseEnv();
 
 const errors = [];
+const warnings = [];
 
 if (!process.env.APP_KEYS?.trim()) {
-  errors.push('APP_KEYS не задан (нужно 4 ключа через запятую)');
+  errors.push('APP_KEYS не задан (4 ключа через запятую)');
 }
 
-if (usesPostgres) {
-  const hasUrl =
-    process.env.DATABASE_URL?.trim() || process.env.DATABASE_PRIVATE_URL?.trim();
-  const hasHost =
-    process.env.DATABASE_HOST?.trim() ||
-    process.env.PGHOST?.trim() ||
-    process.env.PGHOST_PRIVATE?.trim();
+const requestedClient = (process.env.DATABASE_CLIENT ?? '').trim().toLowerCase();
+const postgresReady = hasPostgresEnv();
 
-  if (!hasUrl && !hasHost) {
+if (requestedClient === 'postgres' && !postgresReady) {
+  warnings.push(
+    'DATABASE_CLIENT=postgres, но нет DATABASE_URL/PGHOST. ' +
+      'Strapi запустится на SQLite. Добавьте в Railway → Strapi → Variables: ' +
+      'DATABASE_URL = ${{ИмяСервисаPostgres.DATABASE_PRIVATE_URL}}',
+  );
+  delete process.env.DATABASE_CLIENT;
+}
+
+for (const key of ['DATABASE_URL', 'DATABASE_PRIVATE_URL', 'PGHOST']) {
+  const value = process.env[key];
+  if (value && isUnresolvedRailwayRef(value)) {
     errors.push(
-      'PostgreSQL: задайте DATABASE_URL=${{Postgres.DATABASE_PRIVATE_URL}} ' +
-        'или PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE из сервиса Postgres',
+      `${key} содержит необработанную ссылку "${value}". ` +
+        'В Railway выберите значение через "Add Reference", не копируйте ${{...}} вручную.',
     );
   }
+}
 
-  const url = (process.env.DATABASE_URL ?? process.env.DATABASE_PRIVATE_URL ?? '').trim();
-  if (url.includes('proxy.rlwy.net') && process.env.DATABASE_SSL !== 'true') {
-    console.warn(
-      '[strapi] Предупреждение: публичный Postgres URL. Для Strapi на Railway лучше ' +
-        'DATABASE_URL=${{Postgres.DATABASE_PRIVATE_URL}}',
-    );
-  }
+if (postgresReady && process.env.DATABASE_URL) {
+  console.info(`[strapi] PostgreSQL: ${maskDatabaseUrl(process.env.DATABASE_URL)}`);
+}
+
+for (const message of warnings) {
+  console.warn(`[strapi] ${message}`);
 }
 
 if (errors.length) {
@@ -46,8 +47,9 @@ if (errors.length) {
   for (const message of errors) {
     console.error(`  - ${message}`);
   }
-  console.error(
-    '\nПодсказка: Postgres и Strapi должны быть в одном Railway-проекте.\n',
-  );
   process.exit(1);
+}
+
+function isUnresolvedRailwayRef(value) {
+  return /\$\{\{/.test(value);
 }

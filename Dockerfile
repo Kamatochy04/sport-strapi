@@ -17,6 +17,8 @@ ENV PORT=1337
 
 RUN npm run build
 
+RUN mkdir -p .tmp
+
 EXPOSE 1337
 
 CMD ["npm", "run", "start"]

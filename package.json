@@ -5,7 +5,7 @@
   "description": "A Strapi application",
   "scripts": {
     "prebuild": "node scripts/assert-node20.mjs",
-    "prestart": "node scripts/assert-node20.mjs && node scripts/check-production-env.mjs",
+    "prestart": "node scripts/assert-node20.mjs",
     "build": "strapi build",
     "console": "strapi console",
     "deploy": "strapi deploy",
@@ -13,7 +13,7 @@
     "dev:sh": "bash scripts/run-develop.sh",
     "develop": "bash scripts/run-develop.sh",
     "develop:sh": "bash scripts/run-develop.sh",
-    "start": "strapi start",
+    "start": "node scripts/run-production-start.mjs",
     "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",
     "upgrade:dry": "npx @strapi/upgrade latest --dry"

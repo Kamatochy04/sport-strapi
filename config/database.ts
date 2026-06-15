@@ -76,7 +76,17 @@ function postgresConnection(env: StrapiEnv) {
 }
 
 const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Database => {
-  const client = env('DATABASE_CLIENT', hasPostgresConfig(env) ? 'postgres' : 'sqlite');
+  const requestedClient = env('DATABASE_CLIENT', '').trim().toLowerCase();
+  const postgresAvailable = hasPostgresConfig(env);
+
+  let client: 'mysql' | 'postgres' | 'sqlite';
+  if (postgresAvailable) {
+    client = requestedClient === 'mysql' ? 'mysql' : 'postgres';
+  } else if (requestedClient === 'mysql') {
+    client = 'mysql';
+  } else {
+    client = 'sqlite';
+  }
 
   const connections = {
     mysql: {
@@ -124,7 +134,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Database 
       ...connections[client],
       acquireConnectionTimeout: env.int('DATABASE_CONNECTION_TIMEOUT', 120000),
     },
-  };
+  } as Core.Config.Database;
 };
 
 export default config;
