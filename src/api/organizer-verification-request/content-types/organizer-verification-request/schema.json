@@ -1,0 +1,58 @@
+{
+  "kind": "collectionType",
+  "collectionName": "organizer_verification_requests",
+  "info": {
+    "singularName": "organizer-verification-request",
+    "pluralName": "organizer-verification-requests",
+    "displayName": "Заявка: верификация организатора",
+    "description": "Модератор выбирает решение в поле «Решение»: подтвердить организацию или отклонить. Пока стоит «Ожидает решения», в Sport ничего не отправляется."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "sportVerificationId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "description": "ID заявки в приложении Sport (не менять)."
+    },
+    "sportUserId": {
+      "type": "string",
+      "required": true,
+      "description": "ID пользователя-организатора в Sport."
+    },
+    "submitterName": {
+      "type": "string",
+      "required": false,
+      "description": "Имя отправителя, как в профиле Sport — кто подал заявку (заполняется при создании из Sport)."
+    },
+    "userEmail": {
+      "type": "email",
+      "required": true,
+      "description": "Email организатора."
+    },
+    "organizationName": {
+      "type": "string",
+      "required": true,
+      "description": "Название организации или проекта."
+    },
+    "note": {
+      "type": "text",
+      "required": true,
+      "description": "Текст заявки от организатора."
+    },
+    "reviewStatus": {
+      "type": "enumeration",
+      "enum": ["pending", "approved", "rejected"],
+      "default": "pending",
+      "required": true,
+      "description": "Ожидает решения — не подтверждено и в Sport решение не уходит. Подтвердить организацию — организатор сможет создавать мероприятия. Не подтвердить (отклонить) — отказ; при желании укажите причину ниже."
+    },
+    "rejectionReason": {
+      "type": "text",
+      "description": "Заполняйте при решении «Не подтвердить (отклонить)» — текст увидит организатор в приложении."
+    }
+  }
+}

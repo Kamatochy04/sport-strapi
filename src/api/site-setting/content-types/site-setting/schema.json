@@ -1,0 +1,93 @@
+{
+  "kind": "singleType",
+  "collectionName": "site_settings",
+  "info": {
+    "singularName": "site-setting",
+    "pluralName": "site-settings",
+    "displayName": "Настройки сайта",
+    "description": "Название, контакты, соцсети, тексты шапки и футера Sport."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "siteName": {
+      "type": "string",
+      "required": true,
+      "default": "Sport Events"
+    },
+    "siteTagline": {
+      "type": "string",
+      "required": true,
+      "default": "Grodno"
+    },
+    "logoAbbreviation": {
+      "type": "string",
+      "required": true,
+      "default": "SE"
+    },
+    "aboutText": {
+      "type": "text",
+      "required": true,
+      "default": "Платформа для командных турниров в Гродно и области: собирайте команды, подавайте заявки, создавайте игры турнира и следите за результатами."
+    },
+    "city": {
+      "type": "string",
+      "required": true,
+      "default": "Гродно"
+    },
+    "country": {
+      "type": "string",
+      "required": true,
+      "default": "Беларусь"
+    },
+    "phone": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "schedule": {
+      "type": "string",
+      "required": true
+    },
+    "partnerEmail": {
+      "type": "email",
+      "required": true
+    },
+    "partnerHint": {
+      "type": "string",
+      "default": "площадки, школы, бренды"
+    },
+    "responseTime": {
+      "type": "string",
+      "required": true
+    },
+    "copyrightText": {
+      "type": "string",
+      "default": "Sport Events · Любительский спорт · Не является официальным сайтом спортивных федераций."
+    },
+    "footerNote": {
+      "type": "string",
+      "default": "Версия интерфейса 1.0 · Сделано для демонстрации и развития локального спортивного сообщества."
+    },
+    "tickerItems": {
+      "type": "component",
+      "repeatable": true,
+      "component": "site.ticker-item"
+    },
+    "footerBadges": {
+      "type": "component",
+      "repeatable": true,
+      "component": "site.footer-badge"
+    },
+    "socials": {
+      "type": "component",
+      "repeatable": true,
+      "component": "site.social-link"
+    }
+  }
+}

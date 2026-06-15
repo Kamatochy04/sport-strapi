@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_site_ticker_items",
+  "info": {
+    "displayName": "Строка бегущей ленты",
+    "description": "Текст в верхней бегущей строке сайта"
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

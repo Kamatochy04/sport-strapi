@@ -1,0 +1,68 @@
+{
+  "kind": "collectionType",
+  "collectionName": "articles",
+  "info": {
+    "singularName": "article",
+    "pluralName": "articles",
+    "displayName": "Статья",
+    "description": "Статьи и новости для страницы материалов Sport."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "description": "Заголовок статьи."
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true,
+      "description": "URL-код статьи."
+    },
+    "excerpt": {
+      "type": "text",
+      "required": true,
+      "description": "Краткое описание для карточки статьи."
+    },
+    "content": {
+      "type": "richtext",
+      "required": true,
+      "description": "Полный текст статьи."
+    },
+    "category": {
+      "type": "string",
+      "required": true,
+      "default": "Новости"
+    },
+    "readTime": {
+      "type": "string",
+      "required": true,
+      "default": "5 мин"
+    },
+    "authorName": {
+      "type": "string",
+      "required": true,
+      "default": "Редакция Sport Events"
+    },
+    "imageUrl": {
+      "type": "string",
+      "description": "Внешняя ссылка на обложку, если не используется media cover."
+    },
+    "cover": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "isFeatured": {
+      "type": "boolean",
+      "required": true,
+      "default": false,
+      "description": "Показывать статью в подборке на главной."
+    }
+  }
+}

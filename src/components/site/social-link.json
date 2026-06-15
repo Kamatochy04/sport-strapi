@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_site_social_links",
+  "info": {
+    "displayName": "Соцсеть",
+    "description": "Ссылка на соцсеть с загружаемой иконкой"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "href": {
+      "type": "string",
+      "required": true
+    },
+    "icon": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "iconUrl": {
+      "type": "string"
+    }
+  }
+}

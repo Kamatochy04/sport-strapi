@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_site_footer_badges",
+  "info": {
+    "displayName": "Бейдж футера",
+    "description": "Короткая метка под описанием сайта в футере"
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

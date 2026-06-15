@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "sport_types",
+  "info": {
+    "singularName": "sport-type",
+    "pluralName": "sport-types",
+    "displayName": "Вид спорта",
+    "description": "Виды спорта для турниров. Укажите, командный это вид спорта или индивидуальный."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "description": "Название вида спорта, например Футбол."
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name",
+      "required": true,
+      "description": "Код вида спорта для Sport API."
+    },
+    "isTeamSport": {
+      "type": "boolean",
+      "default": true,
+      "required": true,
+      "description": "Включите, если участие в турнире происходит командами."
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true,
+      "required": true,
+      "description": "Показывать этот вид спорта в Sport."
+    }
+  }
+}
