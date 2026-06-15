@@ -5,7 +5,7 @@
   "description": "A Strapi application",
   "scripts": {
     "prebuild": "node scripts/assert-node20.mjs",
-    "prestart": "node scripts/assert-node20.mjs",
+    "prestart": "node scripts/assert-node20.mjs && node scripts/check-production-env.mjs",
     "build": "strapi build",
     "console": "strapi console",
     "deploy": "strapi deploy",

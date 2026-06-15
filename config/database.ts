@@ -2,10 +2,32 @@ import path from 'path';
 import type { Core } from '@strapi/strapi';
 
 type PgSslConfig = boolean | { rejectUnauthorized: boolean };
+type StrapiEnv = Core.Config.Shared.ConfigParams['env'];
+
+function readEnv(env: StrapiEnv, ...keys: string[]): string | undefined {
+  for (const key of keys) {
+    const value = env(key);
+    if (typeof value === 'string' && value.trim()) return value.trim();
+  }
+  return undefined;
+}
+
+function hasPostgresConfig(env: StrapiEnv): boolean {
+  return Boolean(
+    readEnv(
+      env,
+      'DATABASE_URL',
+      'DATABASE_PRIVATE_URL',
+      'DATABASE_HOST',
+      'PGHOST',
+      'PGHOST_PRIVATE',
+    ),
+  );
+}
 
 function resolvePostgresSsl(
-  env: Core.Config.Shared.ConfigParams['env'],
-  connectionString: string,
+  env: StrapiEnv,
+  hints: { connectionString?: string; host?: string },
 ): PgSslConfig | undefined {
   if (env('DATABASE_SSL') === 'false') return false;
   if (env.bool('DATABASE_SSL', false)) {
@@ -14,20 +36,24 @@ function resolvePostgresSsl(
     };
   }
 
-  const normalized = connectionString.toLowerCase();
-  if (normalized.includes('sslmode=disable')) return false;
-  if (normalized.includes('railway.internal')) return false;
-  if (normalized.includes('sslmode=require') || normalized.includes('proxy.rlwy.net')) {
+  const normalizedUrl = hints.connectionString?.toLowerCase() ?? '';
+  const normalizedHost = hints.host?.toLowerCase() ?? '';
+
+  if (normalizedUrl.includes('sslmode=disable')) return false;
+  if (normalizedUrl.includes('railway.internal') || normalizedHost.includes('railway.internal')) {
+    return false;
+  }
+  if (normalizedUrl.includes('sslmode=require') || normalizedUrl.includes('proxy.rlwy.net')) {
     return { rejectUnauthorized: false };
   }
 
   return undefined;
 }
 
-function postgresConnection(env: Core.Config.Shared.ConfigParams['env']) {
-  const connectionString = env('DATABASE_URL');
+function postgresConnection(env: StrapiEnv) {
+  const connectionString = readEnv(env, 'DATABASE_URL', 'DATABASE_PRIVATE_URL');
   if (connectionString) {
-    const ssl = resolvePostgresSsl(env, connectionString);
+    const ssl = resolvePostgresSsl(env, { connectionString });
     return {
       connectionString,
       schema: env('DATABASE_SCHEMA', 'public'),
@@ -35,21 +61,22 @@ function postgresConnection(env: Core.Config.Shared.ConfigParams['env']) {
     };
   }
 
+  const host = readEnv(env, 'DATABASE_HOST', 'PGHOST', 'PGHOST_PRIVATE') ?? 'localhost';
+  const ssl = resolvePostgresSsl(env, { host });
+
   return {
-    host: env('DATABASE_HOST', 'localhost'),
-    port: env.int('DATABASE_PORT', 5432),
-    database: env('DATABASE_NAME', 'strapi'),
-    user: env('DATABASE_USERNAME', 'strapi'),
-    password: env('DATABASE_PASSWORD', 'strapi'),
+    host,
+    port: env.int('DATABASE_PORT', env.int('PGPORT', 5432)),
+    database: readEnv(env, 'DATABASE_NAME', 'PGDATABASE') ?? 'strapi',
+    user: readEnv(env, 'DATABASE_USERNAME', 'PGUSER') ?? 'strapi',
+    password: readEnv(env, 'DATABASE_PASSWORD', 'PGPASSWORD') ?? 'strapi',
     schema: env('DATABASE_SCHEMA', 'public'),
-    ssl: env.bool('DATABASE_SSL', false) && {
-      rejectUnauthorized: env.bool('DATABASE_SSL_REJECT_UNAUTHORIZED', false),
-    },
+    ...(ssl !== undefined ? { ssl } : {}),
   };
 }
 
 const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Database => {
-  const client = env('DATABASE_CLIENT', env('DATABASE_URL') ? 'postgres' : 'sqlite');
+  const client = env('DATABASE_CLIENT', hasPostgresConfig(env) ? 'postgres' : 'sqlite');
 
   const connections = {
     mysql: {
